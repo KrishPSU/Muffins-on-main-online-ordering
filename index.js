@@ -17,10 +17,10 @@ const resend = new Resend(process.env.RESEND_API_KEY); // replace with your key
 
 
 async function sendEmail(to, subject, html) {
-  if (process.env.NODE_ENV === 'dev') {
-    console.log('DEV mode - skipping email send.');
-    return;
-  }
+  // if (process.env.NODE_ENV === 'dev') {
+  //   console.log('DEV mode - skipping email send.');
+  //   return;
+  // }
 
   if (!to || !subject || !html) {
     console.log('Not enough info, skipping email send.');
@@ -474,7 +474,7 @@ function sendConfirmationEmail(orderId, name, email, orderNum, pickup_date, pick
   let itemsHtml = items.map(item => `
     <tr>
       <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827; border-bottom:1px solid #f3f4f6;">
-        ${item.quantity || 1} × ${item.item}
+        ${item.item}
       </td>
       <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827; border-bottom:1px solid #f3f4f6;" align="right">
         ${item.price}

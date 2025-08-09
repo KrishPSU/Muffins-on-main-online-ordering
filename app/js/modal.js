@@ -6,6 +6,9 @@ const closeModalBtn = document.getElementById('closeModalBtn');
 
 
 function showAddToOrderModal(item) {
+  quantity = 1;
+  updateQuantity();
+
   modalItemInfo.innerHTML = 
     `<div class="menu-catagory-name">${item.category}:</div>
     <div class="menu-item-name">${item.name}</div>` +
@@ -48,11 +51,13 @@ window.onclick = function(event) {
 };
 
 function addToOrder(item) {
-  let itemText = `${item.name} (${item.category})`;
-  let priceText = item.price;
+  let itemQuantity = quantity;
+  let itemText = `${item.name} (${item.category}) × ${itemQuantity}`;
+  let priceText = `$${(parseFloat(item.price.split('$').join('')) * itemQuantity).toFixed(2)}`;
 
   const order = {
     item: itemText,
+    quantity: itemQuantity,
     price: priceText,
   };
 
@@ -61,3 +66,41 @@ function addToOrder(item) {
 
 window.showAddToOrderModal = showAddToOrderModal;
 window.addToOrder = addToOrder;
+
+
+
+
+const quantityText = document.getElementById('quantity_text');
+const quantitySubBtn = document.getElementById('quantity_sub');
+const quantityAddBtn = document.getElementById('quantity_add');
+
+let quantity = 1;
+
+quantityAddBtn.addEventListener('click', () => {
+  quantity++;
+  updateQuantity();
+});
+
+
+quantitySubBtn.addEventListener('click', () => {
+  quantity--;
+  updateQuantity();
+});
+
+
+function updateQuantity() {
+  quantityAddBtn.disabled = false;
+  quantitySubBtn.disabled = false;
+
+  if (quantity >= 10) {
+    quantity = 10;
+    quantityAddBtn.disabled = true;
+  }
+
+  if (quantity <= 1) {
+    quantity = 1;
+    quantitySubBtn.disabled = true;
+  }
+
+  quantityText.innerText = quantity;
+}

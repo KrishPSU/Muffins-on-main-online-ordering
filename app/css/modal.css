@@ -77,6 +77,33 @@
   font-size: 1rem;
   margin-bottom: 25px;
 }
+
+
+#quantitySelector {
+  display: flex;
+  flex-direction: row;
+  /* width: 100%; */
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transform: scale(150%);
+  margin-bottom: 30px;
+}
+#quantitySelector button {
+  border: none;
+  border-radius: 5px;
+  aspect-ratio: 1 / 1;
+  height: 20px;
+  background-color: #b9b6b6;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#quantitySelector button:disabled {
+  background-color: #d6d1d1;
+  cursor: not-allowed;
+}
+
+
 #modalPriceButtons {
   display: flex;
   gap: 18px;

@@ -50,7 +50,7 @@ function setCompleted(isDone) {
 function parseItems(items) {
   let html = ``;
   for (let i=0; i<items.length; i++) {
-    html += `<li><span class="item-name">${items[i].item} × ${items[i].quantity || 1}</span><span class="item-qty">${items[i].price}</span></li>`;
+    html += `<li><span class="item-name">${items[i].item}</span><span class="item-qty">${items[i].price}</span></li>`;
   }
   return html;
 }
