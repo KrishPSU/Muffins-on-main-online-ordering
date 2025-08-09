@@ -12,7 +12,7 @@ async function getOrderStatus() {
     const orderData = response.data;
     document.getElementById('orderId').textContent = orderData.client_order_num;
     document.getElementById('customerName').textContent = `${orderData.client_name} | ${orderData.client_email}`;
-    setCompleted(orderData.completed);
+    setCompleted(orderData.complete);
     document.getElementById('items').innerHTML = parseItems(orderData.client_order);
     document.getElementById('readyTime').innerText = formatDateTime(orderData.client_order_pickup);
 

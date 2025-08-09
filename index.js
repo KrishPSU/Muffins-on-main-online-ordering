@@ -17,10 +17,10 @@ const resend = new Resend(process.env.RESEND_API_KEY); // replace with your key
 
 
 async function sendEmail(to, subject, html) {
-  // if (process.env.NODE_ENV === 'dev') {
-  //   console.log('DEV mode - skipping email send.');
-  //   return;
-  // }
+  if (process.env.NODE_ENV === 'dev') {
+    console.log('DEV mode - skipping email send.');
+    return;
+  }
 
   if (!to || !subject || !html) {
     console.log('Not enough info, skipping email send.');
