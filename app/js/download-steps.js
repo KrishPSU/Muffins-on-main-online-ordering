@@ -6,7 +6,7 @@ function closeMoMPwaPopup() {
 }
 
 (function() {
-  if (localStorage.getItem('hideMoMPwaPopup') === '1') return;
+  // if (localStorage.getItem('hideMoMPwaPopup') === '1') return;
 
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

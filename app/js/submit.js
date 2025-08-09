@@ -163,41 +163,75 @@ function isValidPhoneNumber(phone) {
 
 
 async function submitOrder(orderData) {
+  let orderResponse = null;
+  
   try {
-    const response = await axios.post('/api/orders', orderData);
+    // First, submit the order
+    orderResponse = await axios.post('/api/orders', orderData);
+    console.log('Order submitted successfully:', orderResponse.data);
 
-    const permission = await Notification.requestPermission();
-    if (permission === 'denied') {
-      alert("You've previously blocked notifications. To fix this, please go to iPhone Settings > Safari > Advanced > Website Data, search 'ordermuffinsonmain.com', and delete it. Then re-add the app from Safari.");
-      return; // Exit early if permission denied
-    }
+    // Check if we're on iOS and if the app is running in standalone mode
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    
+    // Only attempt push notifications if:
+    // 1. Not on iOS, OR
+    // 2. On iOS but running in standalone mode (added to home screen)
+    const shouldAttemptPushNotifications = !isIOS || isStandalone;
+    
+    if (shouldAttemptPushNotifications) {
+      try {
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'denied') {
+          console.log('Notifications denied by user, order still successful');
+          if (isIOS) {
+            console.log('iOS user - notifications require home screen app');
+          }
+        } else if (permission === 'granted') {
+          // Use existing service worker registration
+          console.log('Getting service worker registration...');
+          const reg = await navigator.serviceWorker.ready;
+          console.log('Service Worker is ready:', reg);
 
-    // Use existing service worker registration
-    console.log('Getting service worker registration...');
-    const reg = await navigator.serviceWorker.ready;
-    console.log('Service Worker is ready:', reg);
+          // Check if service worker is active
+          if (reg.active) {
+            console.log('Service Worker is active');
+          } else {
+            console.log('Service Worker is not active yet');
+            // Wait a bit more for activation
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
 
-    // Check if service worker is active
-    if (reg.active) {
-      console.log('Service Worker is active');
+          // Now try to subscribe
+          console.log('Creating push subscription...');
+          const sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: 'BPk5VX60JVmOmpdOXCe1JQD6rHQYlgbngjLPk355nAxVLcMS0hjDOprFc4e9xXFvcu_Gy3eJs20mmOvlrEHCH5A'
+          });
+          console.log('Push subscription created:', sub);
+
+          socket.emit('save-subscription', orderData.client_name, sub, orderData.client_order_num);
+          console.log('Push subscription saved for notifications');
+        }
+      } catch (pushError) {
+        console.warn('Push notification setup failed, but order was successful:', pushError);
+        
+        // Handle specific push notification errors
+        if (pushError.name === 'NotAllowedError') {
+          console.log('User denied notification permission');
+        } else if (pushError.message && pushError.message.includes('no active Service Worker')) {
+          console.log('Service Worker not available for notifications');
+        } else {
+          console.log('General push notification error:', pushError.message);
+        }
+      }
     } else {
-      console.log('Service Worker is not active yet');
-      // Wait a bit more for activation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Skipping push notifications - iOS browser without home screen app');
     }
 
-    // Now try to subscribe
-    console.log('Creating push subscription...');
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: 'BPk5VX60JVmOmpdOXCe1JQD6rHQYlgbngjLPk355nAxVLcMS0hjDOprFc4e9xXFvcu_Gy3eJs20mmOvlrEHCH5A'
-    });
-    console.log('Push subscription created:', sub);
-
-    socket.emit('save-subscription', orderData.client_name, sub, orderData.client_order_num);
-
-    if (response.status === 201 || response.status === 200) {
-      console.log('Order submitted:', response.data);
+    // Order success handling (always executes if order was submitted successfully)
+    if (orderResponse && (orderResponse.status === 201 || orderResponse.status === 200)) {
       showCustomAlert('Your order has been placed successfully!', 'success');
 
       drawer_content.style.transform = 'translateX(0)';
@@ -215,48 +249,28 @@ async function submitOrder(orderData) {
       setTimeout(() => {
         window.location.href += `order_confirmed/${btoa(orderData.client_order_num)}`;
       }, 1000);
-
     } else {
-      console.warn('Unexpected response:', response);
-      showCustomAlert('Something went wrong. Please try again.', 'warning');
+      console.warn('Unexpected response from order submission:', orderResponse);
+      showCustomAlert('Order may not have been processed correctly. Please contact us to verify.', 'warning');
     }
+
   } catch (error) {
-    console.error('Service Worker or Push subscription error:', error);
+    console.error('Order submission error:', error);
     
-    if (error.name === 'NotAllowedError') {
-      showCustomAlert('Notification permission denied. Please allow notifications and try again.', 'error');
-    } else if (error.message.includes('no active Service Worker')) {
-      showCustomAlert('Service Worker not ready. Please refresh the page and try again.', 'error');
-    } else {
-      showCustomAlert('Failed to set up notifications. Please try again.', 'error');
-    }
-    
-    // Continue with order submission even if notifications fail
-    if (response && (response.status === 201 || response.status === 200)) {
-      console.log('Order submitted:', response.data);
-      showCustomAlert('Your order has been placed successfully!', 'success');
-
-      drawer_content.style.transform = 'translateX(0)';
-      document.getElementById('orderDrawer').classList.remove('open');
-
-      cart = [];
-      renderCart();
-      updateCartCount()
-      client_name_input.value = "";
-      client_email_input.value = "";
-      pickup_date_input.value = "";
-      pickup_time_input.value = "";
-      updateTotal();
-
-      window.location.href += `order_confirmed/${btoa(orderData.client_order_num)}`;
-
-    } else if (error.response) {
+    // Handle different types of errors
+    if (error.response) {
+      // Server responded with error status
       console.error('Server error:', error.response.data);
-      showCustomAlert(`Server error: ${error.response.data.message || 'Unable to submit order.'}`, 'error');
+      const errorMessage = error.response.data?.message || error.response.data?.error || 'Unable to submit order';
+      showCustomAlert(`Server error: ${errorMessage}`, 'error');
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('Network error - no response:', error.request);
+      showCustomAlert('Network error: Unable to reach server. Please check your internet connection and try again.', 'error');
     } else {
-      console.error('Network error:', error.message);
-      showCustomAlert('Network error. Please check your internet connection.' + error.message, 'error');
-      alert(error.message);
+      // Something else happened
+      console.error('General error:', error.message);
+      showCustomAlert(`Error: ${error.message}`, 'error');
     }
   }
 }

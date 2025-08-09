@@ -17,10 +17,10 @@ const resend = new Resend(process.env.RESEND_API_KEY); // replace with your key
 
 
 async function sendEmail(to, subject, html) {
-  // if (process.env.NODE_ENV === 'dev') {
-  //   console.log('DEV mode - skipping email send.');
-  //   return;
-  // }
+  if (process.env.NODE_ENV === 'dev') {
+    console.log('DEV mode - skipping email send.');
+    return;
+  }
 
   if (!to || !subject || !html) {
     console.log('Not enough info, skipping email send.');
@@ -192,7 +192,7 @@ app.post('/api/orders', async (req, res) => {
       sendConfirmationEmail(data[0].id, name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total);
       updateLogs(`ORDER_RECEIVED`, `Order received from ${name} (${email}) for pickup on ${pickup_date} at ${pickup_time}. Items: ${JSON.stringify(items)}`);
       console.log('Inserted order:', data);
-      res.status(201).json({ message: 'Order received and SMS sent.' });
+      res.status(201).json({ message: 'Order received and email sent.' });
       io.emit('new-order', data[0]);
       console.log(`registered ${name}`);
       activeOrders[orderNum] = data[0].id;
