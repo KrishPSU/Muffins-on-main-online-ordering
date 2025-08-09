@@ -86,6 +86,7 @@ app.use(bodyParser.json());
 app.use('/', express.static(path.join(__dirname, 'app')));
 app.use('/admin', express.static(path.join(__dirname, 'edit-menu-app')));
 app.use('/order_confirmed/:orderNum', express.static(path.join(__dirname, 'order-confirm')));
+app.use('/view_order_status/:orderId', express.static(path.join(__dirname, 'view-order-status')));
 
 // Routes
 app.get('/', (req, res) => {
@@ -100,10 +101,51 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'edit-menu-app', 'edit-menu.html'));
 });
 
+app.get('/view_order_status/:orderId', async (req, res) => {
+  res.sendFile(path.join(__dirname, 'view-order-status', 'order-status.html'));
+});
 
 app.get('/order_confirmed/:orderNum', (req, res) => {
   res.sendFile(path.join(__dirname, 'order-confirm', 'order-confirm.html'));
 });
+
+
+
+
+app.get('/api/order-status/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!orderId) {
+      return res.status(400).json({ error: 'Invalid order id' });
+    }
+
+    // Adjust table and column names to match your schema
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    if (error) {
+      // No rows found
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // You can transform fields here if needed
+    // Example: ensure pickup time is ISO string
+    // if (data.client_order_pickup instanceof Date) {
+    //   data.client_order_pickup = data.client_order_pickup.toISOString();
+    // }
+
+    return res.json(data);
+  } catch (err) {
+    console.error('Route error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 
 
 app.post('/api/orders', async (req, res) => {
@@ -127,8 +169,6 @@ app.post('/api/orders', async (req, res) => {
   // console.log('Received order:', { name, email, items, subtotal, tax, final_total });
 
   try {
-    sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total);
-
     const { data, error } = await supabase
       .from('orders')
       .insert([
@@ -149,6 +189,7 @@ app.post('/api/orders', async (req, res) => {
       console.error('Insert error:', error);
       res.status(500).json({ error: 'There was a problem saving your order.' });
     } else {
+      sendConfirmationEmail(data[0].id, name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total);
       updateLogs(`ORDER_RECEIVED`, `Order received from ${name} (${email}) for pickup on ${pickup_date} at ${pickup_time}. Items: ${JSON.stringify(items)}`);
       console.log('Inserted order:', data);
       res.status(201).json({ message: 'Order received and SMS sent.' });
@@ -375,7 +416,7 @@ io.on('connection', (socket) => {
 
 
 
-function sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total) {
+function sendConfirmationEmail(orderId, name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total) {
   let itemsHtml = items.map(item => `
     <tr>
       <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827; border-bottom:1px solid #f3f4f6;">
@@ -501,7 +542,7 @@ function sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, 
               <!-- CTA -->
               <tr>
                 <td align="center" style="padding:0 24px 24px; color:#FFFFFF">
-                  <a href="{{order_url}}" style="display:inline-block; background:#e74c3c; color:#FFFFFF; text-decoration:none; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:44px; height:44px; padding:0 18px; border-radius:6px;">
+                  <a href="http://ordermuffinsonmain.com/view_order_status/${btoa(orderId)}" style="display:inline-block; background:#e74c3c; color:#FFFFFF; text-decoration:none; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:44px; height:44px; padding:0 18px; border-radius:6px;">
                     View your order
                   </a>
                 </td>
@@ -530,7 +571,7 @@ function sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, 
 
             <!-- Text-only fallback suggestion -->
             <div style="width:600px; max-width:100%; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#9ca3af; padding:12px 0;">
-              If you’re having trouble viewing this email, <a href="{{order_url}}" style="color:#6b7280;">view your order online</a>.
+              If you’re having trouble viewing this email, <a href="http://ordermuffinsonmain.com/view_order_status/${btoa(orderId)}" style="color:#6b7280;">view your order online</a>.
             </div>
           </td>
         </tr>

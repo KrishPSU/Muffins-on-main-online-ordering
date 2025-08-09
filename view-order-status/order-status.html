@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Order Status</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #b91c1c; /* red accent */
+      --ok: #16a34a;
+      --warn: #f59e0b;
+      --badge-bg: #fef2f2; /* light red-pink */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 24px;
+    }
+    .wrap {
+      max-width: 640px;
+      margin: 5vh auto;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      border: 2px solid var(--accent);
+      overflow: hidden;
+    }
+    .head {
+      padding: 22px 22px 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: .2px;
+      color: var(--accent);
+    }
+    .sub {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .badge {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--badge-bg);
+      color: var(--accent);
+      font-weight: bold;
+      white-space: nowrap;
+      border: 1px solid rgba(185, 28, 28, 0.2);
+    }
+    .section {
+      padding: 16px 22px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px 16px;
+    }
+    .label {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      align-self: center;
+    }
+    .value {
+      font-size: 15px;
+      align-self: center;
+    }
+    .value.ok { color: var(--ok); font-weight: 600; }
+    .value.no { color: var(--muted); }
+    ul.items {
+      list-style: none;
+      margin: 6px 0 0;
+      padding: 0;
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #fff;
+    }
+    .items li {
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px dashed var(--line);
+    }
+    .items li:first-child { border-top: 0; }
+    .item-name { color: var(--text); }
+    .item-qty { color: var(--muted); min-width: 40px; text-align: right; }
+    .footer {
+      padding: 16px 22px 22px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .btn {
+      appearance: none; border: 0; cursor: pointer;
+      background: var(--accent); color: #fff;
+      padding: 10px 14px; border-radius: 10px; font-weight: 600;
+      transition: transform .05s ease, background-color .15s ease;
+      text-decoration: none; display: inline-block;
+    }
+    .btn:hover { transform: translateY(-1px); background-color: #991b1b; }
+    @media (max-width: 540px) {
+      .grid { grid-template-columns: 1fr; }
+      .label { margin-top: 8px; }
+    }
+  </style>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="script.js"></script>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <div>
+          <h1>Order Status</h1>
+          <p class="sub">Track your order details below</p>
+        </div>
+        <span class="badge" id="statusBadge">Received</span>
+      </div>
+
+      <div class="section">
+        <div class="grid">
+          <div class="label">Order #</div>
+          <div class="value" id="orderId">12345</div>
+
+          <div class="label">Name</div>
+          <div class="value" id="customerName">John Doe</div>
+
+          <div class="label">Completed?</div>
+          <div class="value no" id="completed">No</div>
+
+          <div class="label">Items</div>
+          <div class="value">
+            <ul class="items" id="items"></ul>
+          </div>
+
+          <div class="label">Ready By</div>
+          <div class="value" id="readyTime"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <a class="btn" href="/">← Make a New Order</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
