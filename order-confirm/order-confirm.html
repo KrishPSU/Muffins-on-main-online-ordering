@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation</title>
+  
+  <!-- Google Font: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 500px;
+      /* margin: 80px auto; */
+      margin: 80px 30px;
+      text-align: center;
+      background: #ffffff;
+      padding: 40px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .checkmark-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .checkmark {
+      font-size: 60px;
+      color: white;
+    }
+
+    p {
+      font-size: 15px;
+      color: #4b5563;
+      margin: 8px 0;
+      font-weight: 400;
+    }
+
+    .order-number {
+      font-size: 16px;
+      color: #111827;
+      font-weight: 500;
+      margin-top: 16px;
+      padding: 8px 14px;
+      background-color: #f3f4f6;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .btn {
+      display: inline-block;
+      font-weight: bold;
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 15px;
+      color: #ffffff;
+      background-color: #e74c3c;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background-color 0.2s ease-in-out;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #c0392b;
+    }
+    .btn span {
+      margin-right: 8px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Order Submitted Successfully!</h1>
+    <div class="checkmark-circle">
+      <div class="checkmark">✔</div>
+    </div>
+    <p>Please check your email for confirmation. It may be in your spam folder.</p>
+    <div class="order-number">Order #12345</div>
+    <br>
+    <a href="/" class="btn"><span>←</span> Start a New Order</a>
+  </div>
+
+  <script>
+    document.querySelector('.order-number').innerText = `Order #${atob(window.location.pathname.split('/order_confirmed/').join('').replace('/', ''))}`;
+  </script>
+
+</body>
+</html>

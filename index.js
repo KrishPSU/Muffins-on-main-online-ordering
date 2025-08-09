@@ -7,10 +7,42 @@ const fs = require('fs');
 const twilio = require('twilio');
 const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
+const { Resend } = require('resend');
+
 require('dotenv').config();
 
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY); // replace with your key
+
+
+async function sendEmail(to, subject, html) {
+  // if (process.env.NODE_ENV === 'dev') {
+  //   console.log('DEV mode - skipping email send.');
+  //   return;
+  // }
+
+  if (!to || !subject || !html) {
+    console.log('Not enough info, skipping email send.');
+    return;
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: 'Muffins on Main Ordering <noreply@ordermuffinsonmain.com>', // this domain must be verified in Resend
+      to: [`${to}`], // destination email(s)
+      subject: subject,
+      html: html,
+    });
+
+    console.log('✅ Email sent:', data);
+    updateLogs(`✅ Email sent:${to}`);
+  } catch (error) {
+    console.error('❌ Error sending email:', error);
+    updateLogs(`❌ Error sending email:${to}`);
+  }
+}
+
 
 
 webpush.setVapidDetails(
@@ -21,6 +53,7 @@ webpush.setVapidDetails(
 
 const activeOrders = {};         // { name: socketId }
 const subscriptions = {}; // { name: PushSubscription }
+
 
 
 // const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -37,10 +70,6 @@ const app = express();
 const server = http.createServer(app);
 // const io = new Server(server);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a15337a6c399976f28acf41ded0ca05e8c7cb0d5
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
@@ -52,14 +81,11 @@ const io = new Server(server, {
   transports: ['polling', 'websocket']
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a15337a6c399976f28acf41ded0ca05e8c7cb0d5
 app.use(bodyParser.json());
 //app.use(express.static(path.join(__dirname, 'app'))); // Serve static files from /app
 app.use('/', express.static(path.join(__dirname, 'app')));
 app.use('/admin', express.static(path.join(__dirname, 'edit-menu-app')));
+app.use('/order_confirmed/:orderNum', express.static(path.join(__dirname, 'order-confirm')));
 
 // Routes
 app.get('/', (req, res) => {
@@ -74,12 +100,18 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'edit-menu-app', 'edit-menu.html'));
 });
 
+
+app.get('/order_confirmed/:orderNum', (req, res) => {
+  res.sendFile(path.join(__dirname, 'order-confirm', 'order-confirm.html'));
+});
+
+
 app.post('/api/orders', async (req, res) => {
   const order = req.body;
 
   const orderNum = req.body.client_order_num;
   const name = req.body.client_name;
-  const phone = req.body.client_phone_number;
+  const email = req.body.client_email;
   const pickup_date = req.body.client_order_pickup.split('T')[0];
   const pickup_time = req.body.client_order_pickup.split('T')[1].slice(0, 5); // Extract HH:MM from the datetime string
   const items = req.body.client_order;
@@ -88,22 +120,14 @@ app.post('/api/orders', async (req, res) => {
   const final_total = req.body.client_final_total;
 
   // Basic validation
-  if (!orderNum || !name || !phone || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || subtotal == 0 || tax == 0 || final_total == 0) {
+  if (!orderNum || !name || !email || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || subtotal == 0 || tax == 0 || final_total == 0) {
     return res.status(400).json({ error: 'Invalid order data.' });
   }
 
-  const orderSummary = items.map(i => `• ${i.item} - ${i.price}`).join('\n');
-  const messageBody = `Hi ${name}, your order has been received:\n\n${orderSummary}\n\nTotal: ${final_total}`;
-
-  // console.log('Received order:', { name, phone, items, subtotal, tax, final_total });
+  // console.log('Received order:', { name, email, items, subtotal, tax, final_total });
 
   try {
-    // await client.messages.create({
-    //   body: messageBody,
-    //   from: process.env.TWILIO_PHONE,
-    //   to: phone,
-    // });
-
+    sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total);
 
     const { data, error } = await supabase
       .from('orders')
@@ -111,7 +135,7 @@ app.post('/api/orders', async (req, res) => {
         {
           client_order_num: orderNum,
           client_name: name,
-          client_phone_number: phone,
+          client_email: email,
           client_order_pickup: `${pickup_date}T${pickup_time}:00`,
           client_order: items,
           client_subtotal: subtotal,
@@ -125,7 +149,7 @@ app.post('/api/orders', async (req, res) => {
       console.error('Insert error:', error);
       res.status(500).json({ error: 'There was a problem saving your order.' });
     } else {
-      updateLogs(`ORDER_RECEIVED`, `Order received from ${name} (${phone}) for pickup on ${pickup_date} at ${pickup_time}. Items: ${JSON.stringify(items)}`);
+      updateLogs(`ORDER_RECEIVED`, `Order received from ${name} (${email}) for pickup on ${pickup_date} at ${pickup_time}. Items: ${JSON.stringify(items)}`);
       console.log('Inserted order:', data);
       res.status(201).json({ message: 'Order received and SMS sent.' });
       io.emit('new-order', data[0]);
@@ -135,8 +159,8 @@ app.post('/api/orders', async (req, res) => {
     }
 
   } catch (err) {
-    console.error('SMS error:', err);
-    res.status(500).json({ error: 'Order received, but SMS failed to send.' });
+    console.error('Email error:', err);
+    res.status(500).json({ error: 'Order received, but email failed to send.' });
   }
 });
 
@@ -346,6 +370,178 @@ io.on('connection', (socket) => {
 
 
 });
+
+
+
+
+
+function sendConfirmationEmail(name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total) {
+  let itemsHtml = items.map(item => `
+    <tr>
+      <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827; border-bottom:1px solid #f3f4f6;">
+        ${item.quantity || 1} × ${item.item}
+      </td>
+      <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827; border-bottom:1px solid #f3f4f6;" align="right">
+        ${item.price}
+      </td>
+    </tr>
+    `
+  ).join('');
+
+
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="x-apple-disable-message-reformatting">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Order Confirmation</title>
+      <style>
+        /* Mobile tweaks (works in most modern clients; ignored by some) */
+        @media only screen and (max-width: 600px) {
+          .container { width: 100% !important; }
+          .px-24 { padding-left: 16px !important; padding-right: 16px !important; }
+          .py-24 { padding-top: 16px !important; padding-bottom: 16px !important; }
+          .stack { display: block !important; width: 100% !important; }
+          .text-right { text-align: left !important; }
+        }
+      </style>
+    </head>
+    <body style="margin:0; padding:0; background:#f5f7fb;">
+      <!-- Preheader (hidden preview text) -->
+      <div style="display:none; font-size:1px; color:#f5f7fb; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+        Your order ${orderNum} has been confirmed. Thanks for ordering from Muffins on Main!
+      </div>
+
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f5f7fb;">
+        <tr>
+          <td align="center" style="padding:24px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="container" style="width:600px; background:#ffffff; border-radius:8px; overflow:hidden;">
+              <!-- Header -->
+              <tr>
+                <td align="center" style="background:white; padding:24px;">
+                  <!-- Logo -->
+                  <a href="https://ordermuffinsonmain.com" style="text-decoration:none;">
+                    <img src="https://ordermuffinsonmain.com/images/MoM-logo-white-red.png" width="140" height="140" alt="Muffins on Main" style="display:block; border:0; outline:none; text-decoration:none; border-radius:8px;">
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Title -->
+              <tr>
+                <td class="px-24 py-24" style="padding:24px; text-align: center;">
+                  <h1 style="margin:0 0 8px; font-family:Arial, Helvetica, sans-serif; font-size:22px; line-height:28px; color:#111827;">
+                    Order Confirmed ✅
+                  </h1>
+                  <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:20px; color:#4b5563;">
+                    Hi ${name}, thanks for your order! We’re getting it ready. You’ll receive an email when it’s done!
+                  </p>
+                  <p style="margin:8px 0 0; font-family:Arial, Helvetica, sans-serif; font-size:13px; line-height:18px; color:#6b7280;">
+                    Order #<strong>${orderNum}</strong>
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Order Summary -->
+              <tr>
+                <td class="px-24" style="padding:0 24px 8px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                    <tr>
+                      <td colspan="2" style="padding:12px 0; border-bottom:1px solid #e5e7eb;">
+                        <strong style="font-family:Arial, Helvetica, sans-serif; font-size:15px; color:#111827;">Order Summary</strong>
+                      </td>
+                    </tr>
+
+                    ${itemsHtml}
+
+                    <!-- Totals -->
+                    <tr>
+                      <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#6b7280;">
+                        Subtotal
+                      </td>
+                      <td align="right" style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827;">
+                        $${subtotal}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 0 12px; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#6b7280;">
+                        Tax
+                      </td>
+                      <td align="right" style="padding:0 0 12px; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#111827;">
+                        $${tax}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:15px; color:#111827; border-top:1px solid #e5e7eb;">
+                        <strong>Total</strong>
+                      </td>
+                      <td align="right" style="padding:12px 0; font-family:Arial, Helvetica, sans-serif; font-size:15px; color:#111827; border-top:1px solid #e5e7eb;">
+                        <strong>$${final_total}</strong>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- Pickup/Delivery Block -->
+              <tr>
+                <td class="px-24" style="padding:0 24px 24px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
+                    <tr>
+                      <td style="padding:16px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:20px; color:#111827; text-align:center;">
+                        <span style="color:#6b7280;">Estimated to be ready by:</span> <br> <b>${pickup_date} at ${pickup_time}</b>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- CTA -->
+              <tr>
+                <td align="center" style="padding:0 24px 24px; color:#FFFFFF">
+                  <a href="{{order_url}}" style="display:inline-block; background:#e74c3c; color:#FFFFFF; text-decoration:none; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:44px; height:44px; padding:0 18px; border-radius:6px;">
+                    View your order
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Contact / Footer -->
+              <tr>
+                <td class="px-24" style="padding:0 24px 24px; text-align: center;">
+                  <p style="margin:0 0 6px; font-family:Arial, Helvetica, sans-serif; font-size:13px; line-height:18px; color:#6b7280;">
+                    Questions? call us at <strong>+1 (978) 788-4365</strong>.
+                  </p>
+                  <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#9ca3af;">
+                    Muffins on Main • 40 Main St • Westford, MA 01886
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td align="center" style="background:#f3f4f6; padding:16px;">
+                  <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#6b7280;">
+                    © ${new Date().getFullYear()} Muffins on Main. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Text-only fallback suggestion -->
+            <div style="width:600px; max-width:100%; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#9ca3af; padding:12px 0;">
+              If you’re having trouble viewing this email, <a href="{{order_url}}" style="color:#6b7280;">view your order online</a>.
+            </div>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  sendEmail(email, `MoM Order Confirmation #${orderNum}`, html);
+}
+
 
 
 

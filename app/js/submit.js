@@ -33,36 +33,36 @@ function showCustomAlert(message, type = 'success', duration = 5000) {
 
 const submit_order_btn = document.getElementById('submit_order');
 const client_name_input = document.getElementById('client-name');
-const client_phone_number_input = document.getElementById('client-phone-number');
+const client_email_input = document.getElementById('client-email');
 const pickup_date_input = document.getElementById('pickup-date');
 const pickup_time_input = document.getElementById('pickup-time');
 
 submit_order_btn.addEventListener('click', () => {  
   if (cart.length === 0) return;
   let client_name = client_name_input.value.trim();
-  let client_phone_number = client_phone_number_input.value.trim();
+  let client_email = client_email_input.value.trim();
   let pickup_date = pickup_date_input.value.trim();
   let pickup_time = pickup_time_input.value.trim();
 
   if (client_name == "") {
     client_name_input.style.borderColor = "red";
-    showCustomAlert('Please fill all fields.', 'error');
+    showCustomAlert('Please fill the name field.', 'error');
     return;
   } else {
     client_name_input.style.borderColor = "black";
   }
 
-  if (client_phone_number == "" || !isValidPhoneNumber(client_phone_number)) {
-    client_phone_number_input.style.borderColor = "red";
-    showCustomAlert('Please fill all fields.', 'error');
+  if (client_email == "") {
+    client_email_input.style.borderColor = "red";
+    showCustomAlert('Please fill the email field.', 'error');
     return;
   } else {
-    client_phone_number_input.style.borderColor = "black";
+    client_email_input.style.borderColor = "black";
   }
 
   if (pickup_date == "") {
     pickup_date_input.style.borderColor = "red";
-    showCustomAlert('Please fill all fields.', 'error');
+    showCustomAlert('Please enter a pickup date.', 'error');
     return;
   } else {
     pickup_date_input.style.borderColor = "black";
@@ -114,7 +114,7 @@ submit_order_btn.addEventListener('click', () => {
   }
 
 
-  // console.log(client_name, client_phone_number, pickup_date, pickup_time);
+  // console.log(client_name, client_email, pickup_date, pickup_time);
   // return;
 
   let subtotal = 0;
@@ -130,7 +130,7 @@ submit_order_btn.addEventListener('click', () => {
   let orderData = {
     client_order_num: generateOrderNum(),
     client_name: client_name,
-    client_phone_number: client_phone_number,
+    client_email: client_email,
     client_order_pickup: `${pickup_date}T${pickup_time}:00`,
     client_order: cart,
     client_subtotal: subtotal_elem.innerText.split('$').join(''),
@@ -207,10 +207,14 @@ async function submitOrder(orderData) {
       renderCart();
       updateCartCount()
       client_name_input.value = "";
-      client_phone_number_input.value = "";
+      client_email_input.value = "";
       pickup_date_input.value = "";
       pickup_time_input.value = "";
       updateTotal();
+
+      setTimeout(() => {
+        window.location.href += `order_confirmed/${btoa(orderData.client_order_num)}`;
+      }, 1000);
 
     } else {
       console.warn('Unexpected response:', response);
@@ -239,10 +243,13 @@ async function submitOrder(orderData) {
       renderCart();
       updateCartCount()
       client_name_input.value = "";
-      client_phone_number_input.value = "";
+      client_email_input.value = "";
       pickup_date_input.value = "";
       pickup_time_input.value = "";
       updateTotal();
+
+      window.location.href += `order_confirmed/${btoa(orderData.client_order_num)}`;
+
     } else if (error.response) {
       console.error('Server error:', error.response.data);
       showCustomAlert(`Server error: ${error.response.data.message || 'Unable to submit order.'}`, 'error');
@@ -259,10 +266,8 @@ async function submitOrder(orderData) {
 
 
 function generateOrderNum() {
-  const letters = '1234567890';
-  let id = '';
-  for (let i = 0; i < 4; i++) {
-    id += letters[Math.floor(Math.random() * letters.length)];
-  }
-  return id;
+  const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+  const random = Math.floor(Math.random() * 100).toString().padStart(2, '0'); // 2 random digits
+  console.log('Generated order number:', timestamp + random);
+  return timestamp + random; // 8-digit number
 }

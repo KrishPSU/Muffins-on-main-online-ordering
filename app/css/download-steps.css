@@ -57,6 +57,17 @@
   padding-left: 1em;
 }
 
+.MoM-pwa-message ul li {
+  margin-top: 7px;
+}
+
+.share-icon {
+  aspect-ratio: 1 / 1;
+  height: 18px;
+  margin-left: 5px;
+  transform: translateY(2px);
+}
+
 #MoM-pwa-close {
   width: 96%;
   background: #d32f2f;
