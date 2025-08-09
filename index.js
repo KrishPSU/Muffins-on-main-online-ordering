@@ -371,9 +371,7 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on('send-notification', (orderId, clientName, orderNum) => {
-
-
+  socket.on('send-notification', (orderId, clientName, orderNum, email) => {
     const title = `Your order is ready!`;
     const message = `Hi ${clientName}, order #${orderNum} is ready for pickup.`;
 
@@ -382,6 +380,7 @@ io.on('connection', (socket) => {
 
     const subscription = subscriptions[orderNum];
     sendPing(subscription, clientName.toLowerCase(), title, message, orderId, orderNum);
+    sendOrderCompleteEmail(email, orderNum);
   });
 
 
@@ -403,9 +402,10 @@ io.on('connection', (socket) => {
       console.log(activeOrders);
       console.log(subscriptions);
 
-    } else {
-      socket.emit('not-registered-for-notis', to);
-    }
+    } 
+    // else {
+    //   socket.emit('not-registered-for-notis', to);
+    // }
   }
 
 
@@ -414,6 +414,60 @@ io.on('connection', (socket) => {
 
 
 
+
+
+function sendOrderCompleteEmail(email, orderNum) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Order Ready</title>
+    </head>
+    <body style="margin:0; padding:0; background-color:#f9fafb; font-family:Arial, sans-serif;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f9fafb; padding:20px 0;">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden;">
+              <!-- Header -->
+              <tr>
+                <td align="center" style="padding:20px; background-color:#22c55e;">
+                  <span style="font-size:50px; color:#ffffff;">✔</span>
+                </td>
+              </tr>
+              <!-- Body -->
+              <tr>
+                <td style="padding:30px; text-align:center;">
+                  <h1 style="margin:0; font-size:22px; color:#111827;">Your Order is Ready for Pickup</h1>
+                  <p style="margin:12px 0 20px; font-size:15px; color:#4b5563; line-height:1.5;">
+                    Thank you for ordering from Muffins on Main! Your order is now ready.  
+                    Please come pick it up at your earliest convenience.
+                  </p>
+                  <p style="margin:0; font-size:15px; color:#4b5563;">Order Number:</p>
+                  <p style="margin:6px 0 20px; display:inline-block; padding:8px 14px; background-color:#f3f4f6; border-radius:6px; font-size:15px; font-weight:bold; color:#111827;">
+                    #${orderNum}
+                  </p>
+                  <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.5;">
+                    If you have any questions, email or call us at<br> <strong>info@muffinsonmain.com</strong> | <strong>(978) 788-4365</strong>.
+                  </p>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="padding:16px; background-color:#f3f4f6; text-align:center; font-size:12px; color:#6b7280;">
+                  Muffins on Main • 40 Main St • Westford, MA 01886
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  sendEmail(email, `MoM Order Confirmation #${orderNum}`, html);
+}
 
 
 function sendConfirmationEmail(orderId, name, email, orderNum, pickup_date, pickup_time, items, subtotal, tax, final_total) {
@@ -552,7 +606,7 @@ function sendConfirmationEmail(orderId, name, email, orderNum, pickup_date, pick
               <tr>
                 <td class="px-24" style="padding:0 24px 24px; text-align: center;">
                   <p style="margin:0 0 6px; font-family:Arial, Helvetica, sans-serif; font-size:13px; line-height:18px; color:#6b7280;">
-                    Questions? call us at <strong>+1 (978) 788-4365</strong>.
+                    Questions? call or email us at <br> <strong>+1 (978) 788-4365</strong> | <strong>info@muffinsonmain.com</strong>.
                   </p>
                   <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#9ca3af;">
                     Muffins on Main • 40 Main St • Westford, MA 01886
