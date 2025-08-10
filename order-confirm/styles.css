@@ -1,0 +1,181 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9fafb;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 500px;
+  /* margin: 80px auto; */
+  margin: 80px 30px;
+  text-align: center;
+  background: #ffffff;
+  padding: 40px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.checkmark-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.checkmark {
+  font-size: 60px;
+  color: white;
+}
+
+p {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 8px 0;
+  font-weight: 400;
+}
+
+.order-number {
+  font-size: 16px;
+  color: #111827;
+  font-weight: 500;
+  margin-top: 16px;
+  padding: 8px 14px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: bold;
+  margin-top: 30px;
+  padding: 12px 24px;
+  font-size: 15px;
+  color: #ffffff;
+  background-color: #e74c3c;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #c0392b;
+}
+.btn span {
+  margin-right: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
+
+
+
+
+
+/* DOWNLOAD STEPS */
+
+
+
+#MoM-pwa-popup {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 32px;
+  margin: auto;
+  max-width: 380px;
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .35s, transform .35s;
+}
+
+#MoM-pwa-popup.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.MoM-pwa-card {
+  background: #f9f9fb;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.17);
+  padding: 1.6em 1.2em 1.2em 1.2em;
+  text-align: center;
+  font-family: system-ui,sans-serif;
+  border: 1px solid #ececec;
+}
+
+.MoM-pwa-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.7em;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(211,47,47,.07);
+}
+
+.MoM-pwa-title {
+  font-weight: 600;
+  font-size: 1.15em;
+  margin-bottom: 0.6em;
+  color: #d32f2f;
+}
+
+.MoM-pwa-message {
+  color: #333;
+  font-size: 1.02em;
+  margin-bottom: 1em;
+}
+
+.MoM-pwa-message ul {
+  text-align: left;
+  margin: 0.6em 0 0 1.2em;
+  color: #333;
+  font-size: 1em;
+  padding-left: 1em;
+}
+
+.MoM-pwa-message ul li {
+  margin-top: 7px;
+}
+
+.share-icon {
+  aspect-ratio: 1 / 1;
+  height: 18px;
+  margin-left: 5px;
+  transform: translateY(2px);
+}
+
+#MoM-pwa-close {
+  width: 96%;
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  padding: 0.8em 0;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.08em;
+  margin-top: 0.5em;
+  box-shadow: 0 2px 8px rgba(211,47,47,.09);
+  cursor: pointer;
+  transition: background .18s;
+}

@@ -466,7 +466,7 @@ function sendOrderCompleteEmail(email, orderNum) {
     </html>
   `;
 
-  sendEmail(email, `MoM Order Confirmation #${orderNum}`, html);
+  sendEmail(email, `MoM Order Ready #${orderNum}`, html);
 }
 
 

@@ -97,6 +97,7 @@
   background-color: #b9b6b6;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: black;
 }
 #quantitySelector button:disabled {
   background-color: #d6d1d1;
