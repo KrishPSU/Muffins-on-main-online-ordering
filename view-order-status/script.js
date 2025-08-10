@@ -18,7 +18,7 @@ async function getOrderStatus() {
 
   } catch (err) {
     if (err.response && err.response.status === 404) {
-      console.log("The order id you provided is invalid and does not exist.");
+      // console.log("The order id you provided is invalid and does not exist.");
       document.body.innerHTML = "The order id you provided is invalid and does not exist.";
       document.body.style.textAlign = "center";
     } else {

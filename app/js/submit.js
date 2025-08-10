@@ -160,7 +160,7 @@ async function submitOrder(orderData) {
   try {
     // First, submit the order
     orderResponse = await axios.post('/api/orders', orderData);
-    console.log('Order submitted successfully:', orderResponse.data);
+    // console.log('Order submitted successfully:', orderResponse.data);
 
     // Check if we're on iOS and if the app is running in standalone mode
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -176,50 +176,50 @@ async function submitOrder(orderData) {
         const permission = await Notification.requestPermission();
         
         if (permission === 'denied') {
-          console.log('Notifications denied by user, order still successful');
+          // console.log('Notifications denied by user, order still successful');
           if (isIOS) {
-            console.log('iOS user - notifications require home screen app');
+            // console.log('iOS user - notifications require home screen app');
           }
         } else if (permission === 'granted') {
           // Use existing service worker registration
-          console.log('Getting service worker registration...');
+          // console.log('Getting service worker registration...');
           const reg = await navigator.serviceWorker.ready;
-          console.log('Service Worker is ready:', reg);
+          // console.log('Service Worker is ready:', reg);
 
           // Check if service worker is active
           if (reg.active) {
-            console.log('Service Worker is active');
+            // console.log('Service Worker is active');
           } else {
-            console.log('Service Worker is not active yet');
+            // console.log('Service Worker is not active yet');
             // Wait a bit more for activation
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
 
           // Now try to subscribe
-          console.log('Creating push subscription...');
+          // console.log('Creating push subscription...');
           const sub = await reg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: 'BPk5VX60JVmOmpdOXCe1JQD6rHQYlgbngjLPk355nAxVLcMS0hjDOprFc4e9xXFvcu_Gy3eJs20mmOvlrEHCH5A'
           });
-          console.log('Push subscription created:', sub);
+          // console.log('Push subscription created:', sub);
 
           socket.emit('save-subscription', orderData.client_name, sub, orderData.client_order_num);
-          console.log('Push subscription saved for notifications');
+          // console.log('Push subscription saved for notifications');
         }
       } catch (pushError) {
-        console.warn('Push notification setup failed, but order was successful:', pushError);
+        // console.warn('Push notification setup failed, but order was successful:', pushError);
         
         // Handle specific push notification errors
         if (pushError.name === 'NotAllowedError') {
-          console.log('User denied notification permission');
+          // console.log('User denied notification permission');
         } else if (pushError.message && pushError.message.includes('no active Service Worker')) {
-          console.log('Service Worker not available for notifications');
+          // console.log('Service Worker not available for notifications');
         } else {
-          console.log('General push notification error:', pushError.message);
+          // console.log('General push notification error:', pushError.message);
         }
       }
     } else {
-      console.log('Skipping push notifications - iOS browser without home screen app');
+      // console.log('Skipping push notifications - iOS browser without home screen app');
     }
 
     // Order success handling (always executes if order was submitted successfully)
@@ -242,26 +242,26 @@ async function submitOrder(orderData) {
         window.location.href += `order_confirmed/${btoa(orderData.client_order_num)}`;
       }, 1000);
     } else {
-      console.warn('Unexpected response from order submission:', orderResponse);
+      // console.warn('Unexpected response from order submission:', orderResponse);
       showCustomAlert('Order may not have been processed correctly. Please contact us to verify.', 'warning');
     }
 
   } catch (error) {
-    console.error('Order submission error:', error);
+    // console.error('Order submission error:', error);
     
     // Handle different types of errors
     if (error.response) {
       // Server responded with error status
-      console.error('Server error:', error.response.data);
+      // console.error('Server error:', error.response.data);
       const errorMessage = error.response.data?.message || error.response.data?.error || 'Unable to submit order';
       showCustomAlert(`Server error: ${errorMessage}`, 'error');
     } else if (error.request) {
       // Request was made but no response received
-      console.error('Network error - no response:', error.request);
+      // console.error('Network error - no response:', error.request);
       showCustomAlert('Network error: Unable to reach server. Please check your internet connection and try again.', 'error');
     } else {
       // Something else happened
-      console.error('General error:', error.message);
+      // console.error('General error:', error.message);
       showCustomAlert(`Error: ${error.message}`, 'error');
     }
   }
@@ -274,6 +274,6 @@ async function submitOrder(orderData) {
 function generateOrderNum() {
   const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
   const random = Math.floor(Math.random() * 100).toString().padStart(2, '0'); // 2 random digits
-  console.log('Generated order number:', timestamp + random);
+  // console.log('Generated order number:', timestamp + random);
   return timestamp + random; // 8-digit number
 }
