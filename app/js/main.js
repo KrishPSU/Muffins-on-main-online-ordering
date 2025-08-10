@@ -157,6 +157,9 @@ function renderMenu(dataGroupedByCategory) {
       categoryDiv.appendChild(itemDiv);
     });
 
+    let menuItems = categoryDiv.querySelectorAll('.menu-item');
+    if (menuItems.length === 0) return;
+
     container.appendChild(categoryDiv);
   });
 }
