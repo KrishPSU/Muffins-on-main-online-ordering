@@ -37,7 +37,12 @@ const client_email_input = document.getElementById('client-email');
 const pickup_date_input = document.getElementById('pickup-date');
 const pickup_time_input = document.getElementById('pickup-time');
 
-submit_order_btn.addEventListener('click', () => {  
+submit_order_btn.addEventListener('click', (e) => {  
+  e.preventDefault();
+  submit_order_btn.disabled = true;
+  submit_order_btn.textContent = "SUbmitting..";
+
+
   if (cart.length === 0) return;
   let client_name = client_name_input.value.trim();
   let client_email = client_email_input.value.trim();
