@@ -38,7 +38,8 @@ goToOrderDetailsBtn.addEventListener('click', () => {
 });
 
 
-backToItemsList.addEventListener('click', () => {
+backToItemsList.addEventListener('click', (e) => {
+  e.preventDefault();
   drawer_content.style.transform = 'translateX(0)'; // slide back to 1st element
 });
 
