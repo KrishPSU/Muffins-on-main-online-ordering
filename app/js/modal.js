@@ -20,6 +20,8 @@ function showAddToOrderModal(item) {
   const createPriceButton = (label, size, basePrice) => {
     const btn = document.createElement('button');
     btn.className = 'price-button';
+    // Store the base price as a data attribute for easy access
+    btn.dataset.basePrice = basePrice;
     btn.textContent = `Add to Order: $${basePrice}`;
 
     btn.onclick = () => {
@@ -103,4 +105,16 @@ function updateQuantity() {
   }
 
   quantityText.innerText = quantity;
+  
+  // Update the price button text to show total price
+  updatePriceButtonText();
+}
+
+function updatePriceButtonText() {
+  const priceButtons = modalPriceButtons.querySelectorAll('.price-button');
+  priceButtons.forEach(button => {
+    const basePrice = parseFloat(button.dataset.basePrice);
+    const totalPrice = (basePrice * quantity).toFixed(2);
+    button.textContent = `Add to Order: $${totalPrice}`;
+  });
 }

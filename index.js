@@ -4,7 +4,6 @@ const { Server } = require('socket.io');
 const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const twilio = require('twilio');
 const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
 const { Resend } = require('resend');
@@ -131,12 +130,6 @@ app.get('/api/order-status/:orderId', async (req, res) => {
       // No rows found
       return res.status(404).json({ error: 'Order not found' });
     }
-
-    // You can transform fields here if needed
-    // Example: ensure pickup time is ISO string
-    // if (data.client_order_pickup instanceof Date) {
-    //   data.client_order_pickup = data.client_order_pickup.toISOString();
-    // }
 
     return res.json(data);
   } catch (err) {
