@@ -82,6 +82,9 @@ editItemForm.addEventListener('submit', (e) => {
     const oldIndex = menuDataByCategories[oldCategory].findIndex(item => item.id === updatedItem.id);
     if (oldIndex !== -1) {
       menuDataByCategories[oldCategory].splice(oldIndex, 1);
+      if (menuDataByCategories[oldCategory].length == 0) {
+        delete menuDataByCategories[oldCategory];
+      }
     }
   }
 
