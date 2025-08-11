@@ -236,9 +236,11 @@ app.get('/api/menu', async (req, res) => {
 
 
 async function updateLogs(for_, msg) {
-  const { data, error } = await supabase
-    .from('logs')
-    .insert({ for: for_, message: msg })
+  // const { data, error } = await supabase
+  //   .from('logs')
+  //   .insert({ for: for_, message: msg })
+
+  console.log(`${for_} | ${msg}`);
 }
 
 
