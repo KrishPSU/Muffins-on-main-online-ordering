@@ -20,6 +20,21 @@ axios.get('/api/menu')
     allMenuData = response.data.data || [];
     menuDataByCategories = response.data.groupedByCategory || {};
 
+    // Sort categories to put muffins first
+    const sortedCategories = Object.keys(menuDataByCategories).sort((a, b) => {
+      if (a.toLowerCase().includes('muffin')) return -1;
+      if (b.toLowerCase().includes('muffin')) return 1;
+      return a.localeCompare(b);
+    });
+    
+    // Create new sorted object
+    const sortedMenuData = {};
+    sortedCategories.forEach(category => {
+      sortedMenuData[category] = menuDataByCategories[category];
+    });
+    
+    menuDataByCategories = sortedMenuData;
+
     populateCategoryDropdown(menuDataByCategories);
     renderMenu(menuDataByCategories); // initial render
   })
