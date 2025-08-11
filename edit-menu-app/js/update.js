@@ -83,6 +83,9 @@ deleteConfirmBtn.addEventListener('click', () => {
     // Update the menuDataByCategories variable
     Object.keys(menuDataByCategories).forEach(category => {
       menuDataByCategories[category] = menuDataByCategories[category].filter(item => item.id !== itemId);
+      if (menuDataByCategories[category].length == 0) {
+        delete menuDataByCategories[category];
+      }
     });
     filterAndRender(); // Re-render the menu
   }

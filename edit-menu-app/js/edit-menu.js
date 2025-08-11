@@ -67,6 +67,10 @@ function filterAndRender() {
         filteredData[category] = [];
       }
       filteredData[category].push(item);
+
+      if (filteredData[category].length == 0) {
+        delete filteredData[category];
+      }
     });
   }
 

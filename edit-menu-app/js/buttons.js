@@ -46,19 +46,6 @@ itemForm.onsubmit = function(e) {
   socket.emit('add-menu-item', newItem);
   modal.style.display = 'none';
   itemForm.reset();
-
-
-  // Add new item to the menu data
-  allMenuData.push(newItem);
-  
-  // Update the grouped data
-  if (!menuDataByCategories[newItem.category]) {
-    menuDataByCategories[newItem.category] = [];
-  }
-  menuDataByCategories[newItem.category].push(newItem);
-
-  // Re-render the menu
-  renderMenu(menuDataByCategories);
 };
 
 
@@ -113,4 +100,20 @@ editItemForm.addEventListener('submit', (e) => {
   filterAndRender();
   editItemModal.style.display = 'none';
   editItemForm.reset();
+});
+
+
+
+socket.on('menu-item-added', (newItem) => {
+  // Add new item to the menu data
+  allMenuData.push(newItem);
+  
+  // Update the grouped data
+  if (!menuDataByCategories[newItem.category]) {
+    menuDataByCategories[newItem.category] = [];
+  }
+  menuDataByCategories[newItem.category].push(newItem);
+
+  // Re-render the menu
+  renderMenu(menuDataByCategories);
 });
