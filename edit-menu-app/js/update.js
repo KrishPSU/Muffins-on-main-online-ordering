@@ -15,6 +15,16 @@ menuContainer.addEventListener('click', function(e) {
         editItemForm.querySelector('input[name="category"]').value = item.category;
         editItemForm.querySelector('input[name="hidden"]').checked = item.hidden;
         editItemForm.dataset.itemId = id; // Store the ID for later use
+
+        let fileInfoElem = document.getElementById('editSelectedFileInfo');
+        
+        axios.get(`https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif`)
+          .then(res => {
+            fileInfoElem.innerHTML = `
+              <div class="file-name">${item.id}.avif</div>
+            `;
+            fileInfoElem.classList.add('show');
+          });
       }
     }
   }

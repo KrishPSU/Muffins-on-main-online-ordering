@@ -47,10 +47,41 @@ itemForm.onsubmit = function(e) {
   console.log(newItem);
 
   // Do something with data (e.g., send to server or display)
-  // socket.emit('add-menu-item', newItem);
+  socket.emit('add-menu-item', newItem);
   modal.style.display = 'none';
-  itemForm.reset();
+  // itemForm.reset();
 };
+
+
+
+async function uploadImage(itemId) {
+  try {
+    // Create FormData and upload the file
+    const formData = new FormData();
+    formData.append('image', document.getElementById('itemImage').files?.[0]);
+    formData.append('item_id', itemId);
+    
+    const response = await fetch(`/api/upload-image/${itemId}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+    
+    const result = await response.json();
+    
+    // console.log(result.filename);
+    // console.log(result.publicUrl);
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert("The item was added but we had problems with the image. Try again by editing.");
+  }
+}
+
+
 
 
 
@@ -115,7 +146,12 @@ editItemForm.addEventListener('submit', (e) => {
 
 
 
-socket.on('menu-item-added', (newItem) => {
+socket.on('menu-item-added', (newItem, image) => {
+
+  if (image.byteLength != 0) {
+    uploadImage(newItem.id);
+  }
+
   // Add new item to the menu data
   allMenuData.push(newItem);
   

@@ -7,12 +7,33 @@ const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
 const { Resend } = require('resend');
+const multer = require('multer');
 
 require('dotenv').config();
 
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY); // replace with your key
+
+
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Only allow images
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
 
 
 async function sendEmail(to, subject, html) {
@@ -108,6 +129,55 @@ app.get('/order_confirmed/:orderNum', (req, res) => {
   res.sendFile(path.join(__dirname, 'order-confirm', 'order-confirm.html'));
 });
 
+
+
+
+// Add this new endpoint for image uploads
+app.post('/api/upload-image/:itemId', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const file = req.file;
+    const itemId = req.params.itemId;
+    const originalName = file.originalname;
+    const fileExtension = originalName.split('.').pop();
+    
+    const newFileName = `${itemId}.${fileExtension}`;
+    
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('images') // You'll need to create this bucket in Supabase
+      .upload(newFileName, file.buffer, {
+        contentType: file.mimetype,
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return res.status(500).json({ error: 'Failed to upload image to storage' });
+    }
+
+    // Get the public URL for the uploaded image
+    const { data: urlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(newFileName);
+
+    // Return the new filename and public URL
+    res.json({
+      success: true,
+      filename: newFileName,
+      publicUrl: urlData.publicUrl,
+      originalName: originalName
+    });
+
+  } catch (error) {
+    console.error('Image upload error:', error);
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
 
 
 
@@ -292,7 +362,7 @@ io.on('connection', (socket) => {
     }
 
     // Emit the new item to all connected clients
-    io.emit('menu-item-added', data[0]);
+    io.emit('menu-item-added', data[0], newItem.image);
   });
 
 

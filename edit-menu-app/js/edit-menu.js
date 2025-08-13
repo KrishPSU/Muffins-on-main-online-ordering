@@ -167,6 +167,7 @@ function renderMenu(dataGroupedByCategory) {
 createNewItemBtn.addEventListener('click', () => {
   modal.style.display = 'flex';
   itemForm.reset(); // Reset form fields
+  document.getElementById('selectedFileInfo').style.display = "none";
 });
 
 // Image upload functionality
@@ -175,7 +176,9 @@ function setupImageUpload(inputId, infoId) {
   const fileInfo = document.getElementById(infoId);
   
   fileInput.addEventListener('change', function(e) {
+
     const file = e.target.files[0];
+    fileInfo.style.display = "block";
     
     if (file) {
       // Validate file type
