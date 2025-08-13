@@ -127,6 +127,24 @@ h1 button {
 }
 
 
+
+.show-image-btn {
+  margin-left: 10px;
+  border: none;
+  background-color: #607D8B;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.show-image-btn:hover {
+  background-color: #415a66;
+}
+
+
+
 .category, .price {
   font-weight: 500;
   color: #b22222;
@@ -197,6 +215,12 @@ h1 button {
 
 
 @media (max-width: 650px) {
+
+  .show-image-btn {
+    margin-left: 0px;
+    margin-top: 15px;
+  }
+
   .menu-item {
     flex-direction: column;
     align-items: center;

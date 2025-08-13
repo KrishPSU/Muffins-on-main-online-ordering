@@ -130,7 +130,7 @@ function renderMenu(dataGroupedByCategory) {
       const itemHtml = `
         <div class="menu-item" id="${item.id}">
           <div class="item-info">
-            <p id="item-id">ID: ${item.id}</p>
+            <p id="item-id">ID: ${item.id} <button data-item-id="${item.id}" class="show-image-btn">View Image</button></p>
             <h2>${item.name}</h2>
             <p>Category: <span class="category">${category}</span></p>
             <p>Price: $<span class="price">${item.price}</span></p>
@@ -153,6 +153,13 @@ function renderMenu(dataGroupedByCategory) {
     });
     container.appendChild(categoryWrapper);
   });
+
+  const allShowImageBtns = document.querySelectorAll('.show-image-btn');
+  allShowImageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      openViewImageModal(btn.dataset.itemId);
+    });
+  });
 }
 
 
@@ -160,4 +167,48 @@ function renderMenu(dataGroupedByCategory) {
 createNewItemBtn.addEventListener('click', () => {
   modal.style.display = 'flex';
   itemForm.reset(); // Reset form fields
+});
+
+// Image upload functionality
+function setupImageUpload(inputId, infoId) {
+  const fileInput = document.getElementById(inputId);
+  const fileInfo = document.getElementById(infoId);
+  
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        fileInput.value = '';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image file size must be less than 5MB.');
+        fileInput.value = '';
+        return;
+      }
+      
+      // Display file information
+      const fileName = file.name;
+      const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+      
+      fileInfo.innerHTML = `
+        <div class="file-name">${fileName}</div>
+        <div class="file-size">${fileSize}</div>
+      `;
+      fileInfo.classList.add('show');
+    } else {
+      fileInfo.classList.remove('show');
+    }
+  });
+}
+
+// Initialize image upload functionality when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setupImageUpload('itemImage', 'selectedFileInfo');
+  setupImageUpload('editItemImage', 'editSelectedFileInfo');
 });

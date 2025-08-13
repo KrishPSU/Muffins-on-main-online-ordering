@@ -139,36 +139,58 @@ function renderMenu(dataGroupedByCategory) {
 
       if (item.hidden) return; // Skip hidden items
 
+      // <div class="menu-item" id="${item.id}">
       const itemDiv = document.createElement('div');
       itemDiv.className = 'menu-item';
-      itemDiv.id = item.id; // Set ID for easy updates
+      itemDiv.id = item.id;
 
-      const name = document.createElement('div');
-      name.className = 'menu-item-name';
-      name.textContent = item.name;
+      // <img class="menu-item-image" src=".../muffin.avif" alt="${item.name} ${item.category}">
+      const img = document.createElement('img');
+      img.className = 'menu-item-image';
 
-      const description = document.createElement('div');
-      description.className = 'menu-item-description';
-      description.textContent = item.description || '';
+      axios.get(`https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif`)
+        .then(res => {
+          console.log(res);
+          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif`;
+        })
+        .catch(error => {
+          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png`;
+        });
+      img.alt = `${item.name} ${item.category}`;
+      itemDiv.appendChild(img);
 
-      const menu_item_info_div = document.createElement('div');
-      menu_item_info_div.className = "menu-item-info";
-      menu_item_info_div.appendChild(name);
-      menu_item_info_div.appendChild(description);
+      // <div class="menu-item-info"> ... </div>
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'menu-item-info';
 
-      const prices = document.createElement('div');
-      prices.className = 'menu-item-price';
-      let priceText = `$${item.price}`;
-      prices.textContent = priceText;
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'menu-item-name';
+      nameDiv.textContent = item.name;
 
-      const addToOrderBtn = document.createElement('button');
-      addToOrderBtn.className = 'add-to-order-btn';
-      addToOrderBtn.textContent = 'Add to Order';
-      addToOrderBtn.onclick = () => window.showAddToOrderModal(item);
+      const descDiv = document.createElement('div');
+      descDiv.className = 'menu-item-description';
+      descDiv.textContent = item.description || '';
 
-      itemDiv.appendChild(menu_item_info_div);
-      itemDiv.appendChild(prices);
-      itemDiv.appendChild(addToOrderBtn);
+      infoDiv.appendChild(nameDiv);
+      infoDiv.appendChild(descDiv);
+      itemDiv.appendChild(infoDiv);
+
+      // <div class="menu-item-content"> <div class="menu-item-price">...</div> <button class="add-to-order-btn"></button> </div>
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'menu-item-content';
+
+      const priceDiv = document.createElement('div');
+      priceDiv.className = 'menu-item-price';
+      priceDiv.textContent = `$${item.price}`;
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-to-order-btn';
+      addBtn.textContent = 'Add to Order';
+      addBtn.onclick = () => window.showAddToOrderModal?.(item);
+
+      contentDiv.appendChild(priceDiv);
+      contentDiv.appendChild(addBtn);
+      itemDiv.appendChild(contentDiv);
       categoryDiv.appendChild(itemDiv);
     });
 

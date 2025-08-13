@@ -50,20 +50,40 @@ h1 {
   background: #fafafa;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 15px 20px;
+  max-height: 100px;
+  padding-right: 20px;
   display: flex;
   flex-direction: row;
   gap: 20px;
-  justify-content: space-between;
   align-items: center;
-  margin: 8px 0;
+  margin: 10px 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.menu-item-image {
+  aspect-ratio: 1 / 1;
+  height: 100px;
+  /* height: 100%; */
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .menu-item-info {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  /* padding-top: 10px;
+  padding-bottom: 10px; */
+  max-height: 80px;
+  width: 100%;
+}
+
+.menu-item-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
 }
 
 .menu-item-name {
@@ -72,6 +92,7 @@ h1 {
 }
 
 .menu-item-description {
+  font-size: 0.8rem;
   color: #636e72;
 }
 
@@ -163,21 +184,74 @@ h1 {
 }
 
 @media (max-width: 600px) {
+
+    /* Card becomes a grid with a full-width bottom row */
+  .menu-item {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    grid-template-rows: auto auto; /* row 1: image+info, row 2: button */
+    gap: 0px;
+    align-items: center;
+    padding: 0;                /* let the button span edge-to-edge */
+    margin-bottom: 20px;
+    max-height: none;          /* undo desktop cap */
+    border-radius: 8px;
+    overflow: hidden;          /* ensures nice rounded corners for the button */
+    background: #fafafa;
+  }
+
+  /* Image on the left, fixed size */
+  .menu-item-image {
+    object-fit: cover;
+    border-radius: 0;          /* corners handled by parent overflow */
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+
+  /* Text on the right */
+  .menu-item-info {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    padding: 12px 12px 8px;
+    max-height: none;
+    width: 90%;
+    text-align: center;
+  }
+
+  /* Bottom row spans the full card width */
+  .menu-item-content {
+    grid-column: 1 / -1;       /* span both columns */
+    grid-row: 2 / 3;
+    display: block;            /* make it visible on mobile */
+    width: 100%;
+  }
+
+  /* Hide price on mobile (keep if you want it) */
   .menu-item-price {
     display: none;
   }
 
-  #viewOrderBtn {
+  /* Full-width bottom button */
+  .add-to-order-btn {
+    width: 100%;
+    display: block;
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: 0 0 8px 8px; /* matches card corners */
+    box-shadow: none;           /* optional: flatter mobile look */
+  }
+
+
+  
+  
+  /* #viewOrderBtn {
     position: fixed;
     bottom: 20px;
     right: 25px;
     width: calc(100% - 40px);
     height: 50px;
     box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08), 0 1.5px 4px 0 rgba(0,0,0,0.10);
-    /* box-shadow: 0 10px 12px rgba(231, 76, 60, 0.25); */
-    /* transform: translateX(50%); */
-    /* max-width: 300px; */
-  }
+  } */
 }
 
 .menu-item-note {

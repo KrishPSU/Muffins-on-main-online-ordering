@@ -51,8 +51,8 @@
         </label><br><br>
 
         <label>
-          Description:<br>
-          <textarea name="description" rows="2"></textarea>
+          Description: <span class="desc-char-limit" id="add-item-desc-char-limit">(0/60)</span><br>
+          <textarea id="add-item-desc-textarea" name="description" rows="2" maxlength="60"></textarea>
         </label><br><br>
 
         <label>
@@ -63,6 +63,18 @@
         <label>
           Category:<br>
           <input type="text" name="category" required>
+        </label><br><br>
+
+        <label>
+          Image:<br>
+          <div class="image-upload-container">
+            <input type="file" name="image" id="itemImage" accept="image/avif" class="image-input">
+            <label for="itemImage" class="image-upload-btn">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">Choose Image</span>
+            </label>
+            <div class="selected-file-info" id="selectedFileInfo"></div>
+          </div>
         </label><br><br>
 
         <label id="modal-hidden-toggle-element">
@@ -89,8 +101,8 @@
         </label><br><br>
 
         <label>
-          Description:<br>
-          <textarea name="description" rows="2"></textarea>
+          Description: <span class="desc-char-limit" id="edit-item-desc-char-limit">(0/60)</span><br>
+          <textarea id="edit-item-desc-textarea" name="description" rows="2" maxlength="60"></textarea>
         </label><br><br>
 
         <label>
@@ -101,6 +113,18 @@
         <label>
           Category:<br>
           <input type="text" name="category" required>
+        </label><br><br>
+
+        <label>
+          Image:<br>
+          <div class="image-upload-container">
+            <input type="file" name="image" id="editItemImage" accept="image/avif" class="image-input">
+            <label for="editItemImage" class="image-upload-btn">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">Choose Image</span>
+            </label>
+            <div class="selected-file-info" id="editSelectedFileInfo"></div>
+          </div>
         </label><br><br>
 
         <label id="modal-hidden-toggle-element">
@@ -126,6 +150,18 @@
         <button id="confirm-delete-btn" class="danger">Delete</button>
         <button id="cancel-delete-btn">Cancel</button>
       </div>
+    </div>
+  </div>
+
+
+
+  <div class="view-image-modal">
+    <div class="view-image-dialog" role="dialog">
+      <div class="view-image-modal-top">
+        <p id="view-image-modal-header">Viewing uploaded image</p>
+        <button id="close-image-view-modal">&times;</button>
+      </div>
+      <img id="view-image-elem" alt="Loading..">
     </div>
   </div>
 

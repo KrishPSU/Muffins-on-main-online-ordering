@@ -40,10 +40,14 @@ itemForm.onsubmit = function(e) {
     description: formData.get('description'),
     price: parseFloat(formData.get('price')),
     hidden: !!formData.get('hidden'),
-    category: formData.get('category')
+    category: formData.get('category'),
+    image: formData.get('image')
   };
+
+  console.log(newItem);
+
   // Do something with data (e.g., send to server or display)
-  socket.emit('add-menu-item', newItem);
+  // socket.emit('add-menu-item', newItem);
   modal.style.display = 'none';
   itemForm.reset();
 };
@@ -52,6 +56,7 @@ itemForm.onsubmit = function(e) {
 
 editItemForm.addEventListener('submit', (e) => {
   e.preventDefault();
+
   const formData = new FormData(editItemForm);
   const updatedItem = {
     id: editItemForm.dataset.itemId,
@@ -59,10 +64,13 @@ editItemForm.addEventListener('submit', (e) => {
     description: formData.get('description'),
     price: parseFloat(formData.get('price')),
     hidden: !!formData.get('hidden'),
-    category: formData.get('category')
+    category: formData.get('category'),
+    image: formData.get('image')
   };
 
-  socket.emit('update-menu-item', updatedItem);
+  console.log(updatedItem);
+
+  // socket.emit('update-menu-item', updatedItem);
 
   // Update the local menu data
   const index = allMenuData.findIndex(item => item.id === updatedItem.id);
@@ -120,3 +128,42 @@ socket.on('menu-item-added', (newItem) => {
   // Re-render the menu
   renderMenu(menuDataByCategories);
 });
+
+
+
+
+
+
+
+
+
+const viewImageModal = document.querySelector('.view-image-modal');
+const viewImageDialog = document.querySelector('.view-image-dialog');
+const viewImageCloseBtn = document.getElementById('close-image-view-modal');
+const viewImageElem = document.getElementById('view-image-elem');
+
+
+function openViewImageModal(itemId) {
+  axios.get(`https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${itemId}.avif`)
+    .then(res => {
+      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${itemId}.avif`;
+    })
+    .catch(error => {
+      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png`;
+    });
+
+  viewImageModal.classList.add('is-open');
+}
+
+
+
+(() => {
+  function close() { 
+    viewImageModal.classList.remove('is-open');
+    viewImageElem.src = '';
+  }
+
+  viewImageCloseBtn?.addEventListener('click', close);
+  viewImageModal?.addEventListener('click', (e) => { if (!viewImageDialog.contains(e.target)) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();

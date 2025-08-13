@@ -91,3 +91,31 @@ deleteConfirmBtn.addEventListener('click', () => {
   }
   deleteModal.style.display = 'none';
 });
+
+
+
+
+const addItemDescTextarea = document.getElementById('add-item-desc-textarea');
+const addItemcharCountText = document.getElementById('add-item-desc-char-limit');
+
+const editItemDescTextarea = document.getElementById('edit-item-desc-textarea');
+const editItemcharCountText = document.getElementById('edit-item-desc-char-limit');
+
+addItemDescTextarea.addEventListener('keypress', () => {
+  updateAddItemCharCount();
+});
+
+editItemDescTextarea.addEventListener('keypress', () => {
+  updateEditItemCharCount();
+});
+
+
+function updateAddItemCharCount() {
+  let chars = addItemDescTextarea.value.length;
+  addItemcharCountText.innerText = `(${chars}/60)`;
+}
+
+function updateEditItemCharCount() {
+  let chars = editItemDescTextarea.value.length;
+  editItemcharCountText.innerText = `(${chars}/60)`;
+}
