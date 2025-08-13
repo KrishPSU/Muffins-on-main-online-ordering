@@ -132,6 +132,36 @@ app.get('/order_confirmed/:orderNum', (req, res) => {
 
 
 
+app.post('/api/delete-image/:itemId', async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+    const fileExtension = req.query.extension || 'avif'; // Default to avif if not specified
+    
+    const filename = `${itemId}.${fileExtension}`;
+    
+    // Delete from Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('images')
+      .remove([filename]);
+
+    if (error) {
+      console.error('Supabase delete error:', error);
+      return res.status(500).json({ error: 'Failed to delete image from storage' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Image deleted successfully',
+      deletedFile: filename
+    });
+
+  } catch (error) {
+    console.error('Image delete error:', error);
+    res.status(500).json({ error: 'Failed to delete image' });
+  }
+});
+
+
 // Add this new endpoint for image uploads
 app.post('/api/upload-image/:itemId', upload.single('image'), async (req, res) => {
   try {
@@ -416,6 +446,14 @@ io.on('connection', (socket) => {
     if (error) {
       console.error('delete-menu-item-err:', error);
       return;
+    }
+
+    const { error: imageDeleteError } = await supabase.storage
+      .from('images')
+      .remove([`${id}.avif`]);
+
+    if (imageDeleteError) {
+      console.error('image-delete-err:', imageDeleteError);
     }
 
     // Emit the deleted item to all connected clients

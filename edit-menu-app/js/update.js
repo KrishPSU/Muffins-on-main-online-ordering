@@ -88,6 +88,8 @@ deleteConfirmBtn.addEventListener('click', () => {
   const itemId = deleteConfirmBtn.dataset.itemId;
   if (itemId) {
     socket.emit('delete-item', itemId);
+    deleteImage(itemId);
+
     // Remove the item from allMenuData
     allMenuData = allMenuData.filter(item => item.id !== itemId);
     // Update the menuDataByCategories variable
@@ -101,6 +103,30 @@ deleteConfirmBtn.addEventListener('click', () => {
   }
   deleteModal.style.display = 'none';
 });
+
+
+async function deleteImage(filename) {
+  try {
+    const response = await fetch(`/api/delete-image/${filename}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      throw new Error('Delete failed');
+    }
+    
+    const result = await response.json();
+    console.log('Image deleted:', result.message);
+
+    return true;
+    
+  } catch (error) {
+    console.error('Delete error:', error);
+    return false;
+  }
+}
+
+
 
 
 

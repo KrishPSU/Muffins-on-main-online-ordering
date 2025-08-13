@@ -44,7 +44,7 @@ itemForm.onsubmit = function(e) {
     image: formData.get('image')
   };
 
-  console.log(newItem);
+  // console.log(newItem);
 
   // Do something with data (e.g., send to server or display)
   socket.emit('add-menu-item', newItem);
@@ -54,11 +54,11 @@ itemForm.onsubmit = function(e) {
 
 
 
-async function uploadImage(itemId) {
+async function uploadImage(itemId, imageInput) {
   try {
     // Create FormData and upload the file
     const formData = new FormData();
-    formData.append('image', document.getElementById('itemImage').files?.[0]);
+    formData.append('image', imageInput.files?.[0]);
     formData.append('item_id', itemId);
     
     const response = await fetch(`/api/upload-image/${itemId}`, {
@@ -102,6 +102,13 @@ editItemForm.addEventListener('submit', (e) => {
   console.log(updatedItem);
 
   // socket.emit('update-menu-item', updatedItem);
+
+
+  if (updatedItem.image.name != "") {
+    deleteImage(updatedItem.id);
+    uploadImage(updatedItem.id, document.getElementById('editItemImage'));
+  }
+
 
   // Update the local menu data
   const index = allMenuData.findIndex(item => item.id === updatedItem.id);
@@ -149,7 +156,7 @@ editItemForm.addEventListener('submit', (e) => {
 socket.on('menu-item-added', (newItem, image) => {
 
   if (image.byteLength != 0) {
-    uploadImage(newItem.id);
+    uploadImage(newItem.id, document.getElementById('itemImage'));
   }
 
   // Add new item to the menu data
