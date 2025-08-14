@@ -29,6 +29,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 
 
@@ -52,11 +53,19 @@ h1 button {
 }
 
 
-#dashboard-btn {
-  background-color: gray;
+#go-to-order-list {
+  background-color: #668adb;
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
 }
-#dashboard-btn:hover {
-  background-color: rgb(99, 99, 99);
+#go-to-order-list span {
+  transform: translateY(-2px);
+}
+#go-to-order-list:hover {
+  background-color: #4d6cb4;
 }
 
 

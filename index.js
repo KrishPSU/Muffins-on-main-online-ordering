@@ -105,6 +105,7 @@ app.use(bodyParser.json());
 //app.use(express.static(path.join(__dirname, 'app'))); // Serve static files from /app
 app.use('/', express.static(path.join(__dirname, 'app')));
 app.use('/admin', express.static(path.join(__dirname, 'edit-menu-app')));
+app.use('/admin/order_list', express.static(path.join(__dirname, 'check-order-list')));
 app.use('/order_confirmed/:orderNum', express.static(path.join(__dirname, 'order-confirm')));
 app.use('/view_order_status/:orderId', express.static(path.join(__dirname, 'view-order-status')));
 
@@ -119,6 +120,14 @@ app.use('/admin', basicAuth({
 }));
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'edit-menu-app', 'edit-menu.html'));
+});
+
+app.use('/admin/order_list', basicAuth({
+  users: { 'admin': '1234' },
+  challenge: true
+}));
+app.get('/admin/order_list', (req, res) => {
+  res.sendFile(path.join(__dirname, 'check-order-list', 'order-list.html'));
 });
 
 app.get('/view_order_status/:orderId', async (req, res) => {
@@ -375,6 +384,8 @@ io.on('connection', (socket) => {
       return;
     }
 
+    io.emit('completed-order', orderId);
+
     updateLogs(`ORDER_COMPLETE`, `Order ${orderId} completed for ${name}`);
   });
 
@@ -433,6 +444,22 @@ io.on('connection', (socket) => {
     io.emit('item-visibility-toggled', data[0]);
   });
 
+
+
+  socket.on('delete-order', async (id) => {
+    const { data, error } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error(error);
+    }
+
+    console.log(`ORDER DELETED: ${data} | ${id}`);
+
+    io.emit('order-deleted', id);
+  });
 
 
 

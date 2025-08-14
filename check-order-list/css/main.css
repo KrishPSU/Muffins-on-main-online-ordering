@@ -1,0 +1,169 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f8;
+  color: #333;
+}
+
+.no-orders {
+  color: #525252;
+  text-align: center;
+  font-size: 1.2rem;
+  font-style: italic;
+  font-weight: 600;
+  margin-top: 20px;
+}
+
+
+.wrapper {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+
+h1 button {
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+
+#reload-menu-btn {
+  background-color: #395a70;
+}
+#reload-menu-btn:hover {
+  background-color: #324f63;
+}
+
+
+#go-to-edit-items {
+  background-color: #668adb;
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
+}
+#go-to-edit-items span {
+  transform: translateY(-2px);
+}
+#go-to-edit-items:hover {
+  background-color: #4d6cb4;
+}
+
+
+
+
+
+
+
+
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+}
+
+.order-content {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  gap: 20px;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+
+
+.order-info {
+  border-right: 1px solid;
+  padding-right: 20px;
+}
+
+.order-info h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  color: #34495e;
+}
+
+.order-info p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+
+.order-info p.order-num {
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 15px !important;
+  font-size: 1.1rem !important;
+}
+
+.items {
+  margin-top: 12px;
+  margin-right: 12px;
+}
+
+.items ul {
+  padding-left: 20px;
+  margin: 5px 0 0;
+}
+
+.items li {
+  margin-bottom: 4px;
+}
+
+
+
+
+
+@media (max-width: 600px) {
+  .order-content {
+    flex-direction: column;
+  }
+  .order-info {
+    width: 100%;
+    border-right: none;
+    padding-right: 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid;
+  }
+  .items {
+    margin: 0;
+  }
+}

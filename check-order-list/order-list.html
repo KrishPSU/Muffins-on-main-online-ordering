@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order List</title>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+
+
+
+  <link rel="stylesheet" href="./css/main.css" />
+
+
+  <script defer src="./js/buttons.js"></script>
+
+
+</head>
+<body>
+  
+  <div class="wrapper">
+    <h1>Edit Menu 
+      <button id="reload-menu-btn">Reload &#x21bb;</button>
+      <button id="go-to-edit-items">Edit Items<span>&rarr;</span></button>
+    </h1>
+    <div id="ordersContainer">
+      Loading menu items...
+    </div>
+  </div>
+
+</body>
+</html>

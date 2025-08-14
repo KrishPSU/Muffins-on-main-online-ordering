@@ -1,9 +1,14 @@
 const socket = io(`${window.location.origin}/`); // Initialize socket.io client
 
 const reloadMenuBtn = document.getElementById('reload-menu-btn');
+const goToOrderList = document.getElementById('go-to-order-list');
 
 reloadMenuBtn.addEventListener('click', () => {
   location.reload();
+});
+
+goToOrderList.addEventListener('click', () => {
+  window.location.href = `${window.location.origin}/admin/order_list`;
 });
 
 
