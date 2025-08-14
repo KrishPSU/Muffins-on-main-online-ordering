@@ -267,6 +267,7 @@ span.desc-char-limit {
 .view-image-dialog {
   aspect-ratio: 1 / 1;
   width: 60%;
+  max-width: 500px;
   border: 1px solid;
   background-color: #3b3b3b;
   display: flex;

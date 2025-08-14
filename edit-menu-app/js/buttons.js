@@ -11,8 +11,6 @@ reloadMenuBtn.addEventListener('click', () => {
 
 
 
-
-
 const modal = document.getElementById('itemModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const itemForm = document.getElementById('itemForm');
