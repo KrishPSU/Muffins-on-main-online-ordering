@@ -264,7 +264,7 @@ app.post('/api/orders', async (req, res) => {
   const final_total = req.body.client_final_total;
 
   // Basic validation
-  if (!orderNum || !name || !email || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || subtotal == 0 || tax == 0 || final_total == 0) {
+  if (!orderNum || !name || !email || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || final_total == 0) {
     return res.status(400).json({ error: 'Invalid order data.' });
   }
 

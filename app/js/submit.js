@@ -1,6 +1,12 @@
 // Custom Alert Function
 function showCustomAlert(message, type = 'success', duration = 5000) {
   // Remove any existing alerts
+
+  if (type != 'success') {
+    submit_order_btn.disabled = false;
+    submit_order_btn.textContent = "Submit Order";
+  }
+
   const existingAlerts = document.querySelectorAll('.custom-alert');
   existingAlerts.forEach(alert => alert.remove());
 
@@ -40,7 +46,7 @@ const pickup_time_input = document.getElementById('pickup-time');
 submit_order_btn.addEventListener('click', (e) => {  
   e.preventDefault();
   submit_order_btn.disabled = true;
-  submit_order_btn.textContent = "SUbmitting..";
+  submit_order_btn.textContent = "Submitting..";
 
 
   if (cart.length === 0) return;
@@ -127,9 +133,11 @@ submit_order_btn.addEventListener('click', (e) => {
   let final_total = 0;
   cart.forEach((item) => {
     subtotal += parseFloat(item.price.split('$').join(''));
-    tax += (subtotal * TAX_RATE);
-    final_total += (parseFloat(subtotal) + parseFloat(tax));
+    final_total += parseFloat(item.price.split('$').join(''));
   });
+  
+  // Calculate tax (will always be 0 since TAX_RATE = 0)
+  tax = subtotal * 0;
 
 
   let orderData = {
@@ -139,7 +147,7 @@ submit_order_btn.addEventListener('click', (e) => {
     client_order_pickup: `${pickup_date}T${pickup_time}:00`,
     client_order: cart,
     client_subtotal: subtotal_elem.innerText.split('$').join(''),
-    client_tax: tax_elem.innerText.split('$').join(''),
+    client_tax: tax.toFixed(2),
     client_final_total: final_total_elem.innerText.split('$').join('')
   };
 

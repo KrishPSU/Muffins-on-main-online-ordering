@@ -75,20 +75,20 @@ function updateTotal() {
   let subtotal = update_subtotal();
   let tax = update_tax(subtotal);
   let final_total = updateFinalTotal(subtotal, tax);
-
+  
   subtotal_elem.textContent = `$${subtotal.toFixed(2)}`;
   tax_elem.textContent = `$${tax.toFixed(2)}`;
   final_total_elem.textContent = `$${final_total.toFixed(2)}`;
   updateShadows();
 }
 function update_subtotal() {
-  const subtotal = cart.reduce((sum, item) => {
-    const num = parseFloat(item.price.replace('$', '')) || 0;
-    return sum + num;
-  }, 0);
+  let subtotal = 0;
+  cart.forEach((item) => {
+    subtotal += parseFloat(item.price.split('$').join(''));
+  });
   return subtotal;
 }
-const TAX_RATE = 0.0625;
+const TAX_RATE = 0; // Changed from 0.0625 to 0
 function update_tax(subtotal) {
   return +(subtotal * TAX_RATE).toFixed(2);
 }
