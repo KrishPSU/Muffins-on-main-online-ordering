@@ -192,10 +192,10 @@ const viewImageElem = document.getElementById('view-image-elem');
 function openViewImageModal(itemId) {
   axios.get(`https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${itemId}.avif`)
     .then(res => {
-      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${itemId}.avif`;
+      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${itemId}.avif?${Date.now()}`;
     })
     .catch(error => {
-      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png`;
+      viewImageElem.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png?${Date.now()}`;
     });
 
   viewImageModal.classList.add('is-open');

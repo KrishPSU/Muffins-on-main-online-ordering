@@ -151,10 +151,10 @@ function renderMenu(dataGroupedByCategory) {
       axios.get(`https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif`)
         .then(res => {
           console.log(res);
-          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif`;
+          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/${item.id}.avif?${Date.now()}`;
         })
         .catch(error => {
-          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png`;
+          img.src = `https://xnduhgagnjwwonzwmyyq.supabase.co/storage/v1/object/public/images/no-muffin.png?${Date.now()}`;
         });
       img.alt = `${item.name} ${item.category}`;
       itemDiv.appendChild(img);
