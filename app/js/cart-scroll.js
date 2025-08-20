@@ -34,7 +34,7 @@ goToOrderDetailsBtn.addEventListener('click', () => {
     return;
   }
 
-  if (!isWithinTimeRange) {
+  if (!isWithinTimeRange()) {
     showCustomAlert('Orders can only be placed between 6:30am - 5pm EST.', "error");
     return;
   }
