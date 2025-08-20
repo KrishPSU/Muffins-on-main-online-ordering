@@ -362,6 +362,24 @@ io.on('connection', (socket) => {
   
   // updateLogs(`CONNECTION`, `New connection: ${socket.id}`);
 
+
+  socket.on('get-completed-order-data', async (orderLoadLimit) => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('complete', true)
+      .limit(orderLoadLimit)
+
+      console.log(`Showing ${orderLoadLimit} orders from completed orders.`);
+
+    if (error) {
+      console.error('order-data-retrieval-err:', error);
+      return;
+    }
+    socket.emit('load-completed-order-data', data);
+  });
+
+
   socket.on('get-order-data', async () => {
     const { data, error } = await supabase
       .from('orders')

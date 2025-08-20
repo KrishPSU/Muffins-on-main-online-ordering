@@ -108,6 +108,16 @@ h1 button {
   flex-wrap: wrap;
 }
 
+.incomplete {
+  color: crimson;
+  font-weight: bold;
+}
+
+.complete {
+  color: green;
+  font-weight: bold;
+}
+
 
 
 
@@ -125,6 +135,10 @@ h1 button {
 .order-info p {
   margin: 4px 0;
   font-size: 0.95rem;
+}
+
+p.completed {
+  margin-bottom: 10px;
 }
 
 .order-info p.order-num {
@@ -146,6 +160,65 @@ h1 button {
 
 .items li {
   margin-bottom: 4px;
+}
+
+
+
+
+
+.status-type-wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-evenly;
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+.status-type-wrapper button {
+  border: none;
+  background-color: gray;
+  padding: 10px 20px;
+  color: white;
+  font-weight: bold;
+  width: 100%;
+  margin: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.status-type-wrapper button:hover {
+  opacity: 0.8;
+  background-color: #de7f62;
+}
+.status-type-wrapper button.active {
+  background-color: #FF5722;
+}
+.status-type-wrapper button.active:hover {
+  background-color: #FF5722;
+  opacity: 1;
+}
+
+
+
+
+
+.load-btn-wrapper {
+  display: flex;
+  justify-content: center;
+}
+#load-more-completed-orders {
+  display: none;
+  border: none;
+  background-color: #3F51B5;
+  padding: 15px 25px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#load-more-completed-orders:hover {
+  background-color: #313f8d;
 }
 
 
