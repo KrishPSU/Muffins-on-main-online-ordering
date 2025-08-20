@@ -40,7 +40,7 @@
 #order-details {
   display: flex;
   flex-direction: column;
-  justify-content:space-evenly;
+  /* justify-content: center; */
   height: 93%;
 }
 
@@ -50,12 +50,13 @@
   /* gap: 20px; */
   height: 50%;
   justify-content: space-evenly;
+  margin-top: 25%;
 }
 .client-info div {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
 }
 .client-info div input {
   padding: 5px;

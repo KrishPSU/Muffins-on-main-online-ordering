@@ -256,6 +256,7 @@ app.post('/api/orders', async (req, res) => {
   const orderNum = req.body.client_order_num;
   const name = req.body.client_name;
   const email = req.body.client_email;
+  const phone = req.body.client_phone;
   const pickup_date = req.body.client_order_pickup.split('T')[0];
   const pickup_time = req.body.client_order_pickup.split('T')[1].slice(0, 5); // Extract HH:MM from the datetime string
   const items = req.body.client_order;
@@ -264,7 +265,7 @@ app.post('/api/orders', async (req, res) => {
   const final_total = req.body.client_final_total;
 
   // Basic validation
-  if (!orderNum || !name || !email || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || final_total == 0) {
+  if (!orderNum || !name || !email || !phone || !pickup_date || !pickup_time || !items || items.length === 0 || !subtotal || !tax || !final_total || final_total == 0) {
     return res.status(400).json({ error: 'Invalid order data.' });
   }
 
@@ -278,6 +279,7 @@ app.post('/api/orders', async (req, res) => {
           client_order_num: orderNum,
           client_name: name,
           client_email: email,
+          client_phone: phone,
           client_order_pickup: `${pickup_date}T${pickup_time}:00`,
           client_order: items,
           client_subtotal: subtotal,

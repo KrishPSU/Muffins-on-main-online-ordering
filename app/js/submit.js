@@ -40,6 +40,7 @@ function showCustomAlert(message, type = 'success', duration = 5000) {
 const submit_order_btn = document.getElementById('submit_order');
 const client_name_input = document.getElementById('client-name');
 const client_email_input = document.getElementById('client-email');
+const client_phone_input = document.getElementById('client-phone');
 const pickup_date_input = document.getElementById('pickup-date');
 const pickup_time_input = document.getElementById('pickup-time');
 
@@ -52,6 +53,7 @@ submit_order_btn.addEventListener('click', (e) => {
   if (cart.length === 0) return;
   let client_name = client_name_input.value.trim();
   let client_email = client_email_input.value.trim();
+  let client_phone = client_phone_input.value.trim();
   let pickup_date = pickup_date_input.value.trim();
   let pickup_time = pickup_time_input.value.trim();
 
@@ -69,6 +71,14 @@ submit_order_btn.addEventListener('click', (e) => {
     return;
   } else {
     client_email_input.style.borderColor = "black";
+  }
+
+  if (client_phone == "" || !isValidPhoneNumber(client_phone)) {
+    client_phone_input.style.borderColor = "red";
+    showCustomAlert('Please enter a valid phone number.', 'error');
+    return;
+  } else {
+    client_phone_input.style.borderColor = "black";
   }
 
   if (pickup_date == "") {
@@ -144,6 +154,7 @@ submit_order_btn.addEventListener('click', (e) => {
     client_order_num: generateOrderNum(),
     client_name: client_name,
     client_email: client_email,
+    client_phone: client_phone,
     client_order_pickup: `${pickup_date}T${pickup_time}:00`,
     client_order: cart,
     client_subtotal: subtotal_elem.innerText.split('$').join(''),
@@ -157,11 +168,23 @@ submit_order_btn.addEventListener('click', (e) => {
 
 
 function isValidPhoneNumber(phone) {
-  // Remove all non-digit characters
-  const digitsOnly = phone.replace(/\D/g, '');
+  // Trim whitespace
+  phone = phone.trim();
 
-  // Valid if 10 digits (standard) or 11 digits starting with '1' (US country code)
-  return digitsOnly.length === 10 || (digitsOnly.length === 11 && digitsOnly.startsWith('1'));
+  // Regex explanation:
+  // ^\+?              → optional leading +
+  // (?:\d{1,3})?      → optional country code (1 to 3 digits)
+  // [\s.-]?           → optional space, dot, or dash
+  // (?:\(?\d{2,4}\)?) → area code, 2–4 digits, optional parentheses
+  // [\s.-]?           → optional separator
+  // (?:\d{3,4})       → first local block
+  // [\s.-]?           → optional separator
+  // (?:\d{3,4})       → second local block
+  // (?:\s?x\d+)?      → optional extension like x1234
+  // $                 → end of string
+  const regex = /^\+?(?:\d{1,3})?[\s.-]?(?:\(?\d{2,4}\)?)[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?:\s?(?:x|ext\.?)\d+)?$/i;
+
+  return regex.test(phone);
 }
 
 
@@ -247,6 +270,7 @@ async function submitOrder(orderData) {
       updateCartCount()
       client_name_input.value = "";
       client_email_input.value = "";
+      client_phone_input.value = "";
       pickup_date_input.value = "";
       pickup_time_input.value = "";
       updateTotal();
