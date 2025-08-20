@@ -34,8 +34,35 @@ goToOrderDetailsBtn.addEventListener('click', () => {
     return;
   }
 
+  if (!isWithinTimeRange) {
+    showCustomAlert('Orders can only be placed between 6:30am - 5pm EST.', "error");
+    return;
+  }
+
   drawer_content.style.transform = 'translateX(-340px)'; // slide to 2nd element
 });
+
+function isWithinTimeRange() {
+  // Always work with EST (America/New_York handles EST/EDT automatically)
+  const now = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+  const date = new Date(now);
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  // Convert current time to minutes since midnight
+  const currentMinutes = hours * 60 + minutes;
+
+  // Range: 6:30 AM → 390 minutes, 5:00 PM → 1020 minutes
+  const start = 6 * 60 + 30;
+  const end = 17 * 60;
+
+  return currentMinutes >= start && currentMinutes <= end;
+}
+
+
+
+
 
 
 backToItemsList.addEventListener('click', (e) => {
